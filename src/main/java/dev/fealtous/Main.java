@@ -1,21 +1,13 @@
 package dev.fealtous;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.Textifier;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
-
-import static org.objectweb.asm.Opcodes.ASM9;
 
 public class Main {
 
@@ -23,7 +15,9 @@ public class Main {
     static String targetPackage = null;
     static Set<String> hits = new HashSet<>();
     public static void main(String[] args)  {
+
         targetPackage = args[1];
+
         try {
             File f = new File(args[0]);
             if (f.exists() && f.getName().endsWith(".jar")) {
@@ -179,6 +173,7 @@ public class Main {
     }
     public static boolean load(File jarLocation) throws IOException {
         JarFile jar = new JarFile(jarLocation);
+        //System.out.println(jarLocation.getName());
         currentTarget = jar.getName();
         var entries = jar.entries();
         JarEntry entry = entries.nextElement();
@@ -192,7 +187,10 @@ public class Main {
                 String parsedClass = strw.toString();
                 for (String line : parsedClass.lines().collect(Collectors.toList())) {
                     if (line.matches(".*L[a-zA-Z][a-zA-Z0-9/;<>]+")) {
-                        if (line.contains(targetPackage)) return true;
+                        if (line.contains(targetPackage)) {
+                            //System.out.println(entry.getName());
+                            return true;
+                        }
                     }
                 }
             } else if (entry.getName().endsWith("mods.toml")) {
